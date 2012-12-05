@@ -5,3 +5,25 @@ commands:
   mailchest:
     description: Something about mail
     usage: /<command>
+permissions:
+  mailchest.autocreate:
+    description: Allows you to create a mailbox by placing a chest on a fence
+    default: true
+  mailchest.create:
+    description: Allows you to create a mailbox
+    default: true
+  mailchest.create.others:
+    description: Allows you to create a mailbox for another player
+    default: op
+  mailchest.send:
+    description: Allows you to send packages to another player's mailbox
+    default: true
+  mailchest.snoop:
+    description: Allows you to open other players' mailboxes
+    default: op
+  mailchest.destroy:
+    description: Allows you to destroy other players' mailboxes
+    default: op
+  mailchest.notify:
+    description: Notifies you when you have new mail
+    default: true

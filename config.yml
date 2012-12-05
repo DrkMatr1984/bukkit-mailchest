@@ -1,0 +1,4 @@
+auto-create:
+  fence: true
+  wall: true
+sign-text: 'Mailbox'
