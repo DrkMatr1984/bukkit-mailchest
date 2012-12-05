@@ -1,0 +1,7 @@
+name: MailChest
+main: com.github.deltawhy.mailchest.MailChest
+version: 1.0
+commands:
+  mailchest:
+    description: Something about mail
+    usage: /<command>
