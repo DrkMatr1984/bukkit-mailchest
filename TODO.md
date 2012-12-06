@@ -9,3 +9,4 @@
 * Notify recipient of new mail
 	+ How to deal with multiple boxes?
 * Support double chests
+* Admins should be able to change auto box owner

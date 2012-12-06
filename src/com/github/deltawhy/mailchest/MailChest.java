@@ -80,11 +80,11 @@ public class MailChest extends JavaPlugin {
 	@Override
 	public boolean onCommand(CommandSender sender, Command command,
 			String label, String[] args) {
-		if (command.getName().equalsIgnoreCase("mailchest")) {
+		/*if (command.getName().equalsIgnoreCase("mailchest")) {
 			getLogger().info("auto-create: " + this.getConfig().getBoolean("auto-create"));
 			getLogger().info("sign-text: " + this.getConfig().getString("sign-text"));
 			return true;
-		}
+		}*/
 		return false;
 	}
 	
