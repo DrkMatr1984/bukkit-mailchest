@@ -2,3 +2,4 @@ auto-create:
   fence: true
   wall: true
 sign-text: 'Mailbox'
+protect-mailboxes: true

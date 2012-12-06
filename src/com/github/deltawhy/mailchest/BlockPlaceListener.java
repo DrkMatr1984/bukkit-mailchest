@@ -33,6 +33,39 @@ public class BlockPlaceListener implements Listener {
 	}
 	
 	@EventHandler
+	public void onBlockBreak(BlockBreakEvent event) {
+		Block block = event.getBlock();
+		if (block.getType() == Material.CHEST && plugin.isMailbox(block)) {
+			Player player = event.getPlayer();
+			if (!plugin.destroyMailbox(player, block)) {
+				event.setCancelled(true);
+			}
+		} else if (block.getType() == Material.WALL_SIGN) {
+			Sign sign = (Sign)block.getState();
+			if (sign.getLine(0).equals("[" + plugin.getConfig().getString("sign-text") + "]")) {
+				Player player = event.getPlayer();
+				BlockFace[] directions = {BlockFace.NORTH, BlockFace.SOUTH, BlockFace.EAST, BlockFace.WEST};
+				Block chest = null;
+				
+				for (BlockFace direction : directions) {
+					if (block.getRelative(direction).getType() == Material.CHEST) {
+						chest = block.getRelative(direction);
+						break;
+					}
+				}
+				
+				if (chest == null) {
+					return;
+				}
+				
+				if (!plugin.destroyMailbox(player, chest)) {
+					event.setCancelled(true);
+				}
+			}
+		}
+	}
+	
+	@EventHandler
 	public void onSignChange(SignChangeEvent event) {
 		if (event.getLine(0).equals("[" + plugin.getConfig().getString("sign-text") + "]")) {
 			Player player = event.getPlayer();

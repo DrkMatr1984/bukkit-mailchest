@@ -107,4 +107,37 @@ public class MailChest extends JavaPlugin {
 			return false;
 		}
  	}
+ 	
+ 	public boolean isMailbox(Block block) {
+ 		return mailboxes.containsKey(new MailboxLocation(block.getLocation()));
+ 	}
+ 	
+ 	public Mailbox getMailbox(Block block) {
+ 		return mailboxes.get(new MailboxLocation(block.getLocation()));
+ 	}
+ 	
+ 	public Player getMailboxOwner(Block block) {
+ 		Mailbox mailbox = getMailbox(block);
+ 		if (mailbox == null) return null;
+ 		return getServer().getPlayerExact(mailbox.getOwnerName());
+ 	}
+ 	
+ 	public Player getMailboxOwner(Mailbox mailbox) {
+ 		return getServer().getPlayerExact(mailbox.getOwnerName());
+ 	}
+
+	public boolean destroyMailbox(Player player, Block block) {
+		Mailbox box = getMailbox(block);
+		if (box == null) return true;
+		if (player == null) return !getConfig().getBoolean("protect-mailboxes");
+		if (player.getName().equals(box.getOwnerName()) || player.hasPermission("mailchest.destroy")) {
+			mailboxes.remove(new MailboxLocation(block.getLocation()));
+			writeMailboxData();
+			player.sendMessage(ChatColor.GOLD + "[MailChest] Destroyed a mailbox.");
+			return true;
+		} else {
+			player.sendMessage(ChatColor.RED + "[MailChest] You don't have permission to destroy this mailbox.");
+			return false;
+		}
+	}
 }
