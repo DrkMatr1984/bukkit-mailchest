@@ -53,34 +53,36 @@ public class BlockPlaceListener implements Listener {
 				return;
 			}
 			
-			//attach sign to chest
-			if (signBlock.getType() == Material.SIGN_POST) {
-				signBlock.setType(Material.WALL_SIGN);
-				switch (signBlock.getFace(chest)) {
-				case NORTH:
-					signBlock.setData((byte) 5);
-					break;
-				case SOUTH:
-					signBlock.setData((byte) 4);
-					break;
-				case EAST:
-					signBlock.setData((byte) 3);
-					break;
-				case WEST:
-					signBlock.setData((byte) 2);
-					break;
-				default:
-					break;
+			if (plugin.createMailbox(chest, player)) {
+				//attach sign to chest
+				if (signBlock.getType() == Material.SIGN_POST) {
+					signBlock.setType(Material.WALL_SIGN);
+					switch (signBlock.getFace(chest)) {
+					case NORTH:
+						signBlock.setData((byte) 5);
+						break;
+					case SOUTH:
+						signBlock.setData((byte) 4);
+						break;
+					case EAST:
+						signBlock.setData((byte) 3);
+						break;
+					case WEST:
+						signBlock.setData((byte) 2);
+						break;
+					default:
+						break;
+					}
+					Sign sign = (Sign)signBlock.getState();
+					sign.setLine(0, event.getLine(0));
+					sign.setLine(1, event.getLine(1));
+					sign.setLine(2, event.getLine(2));
+					sign.setLine(3, event.getLine(3));
+					sign.update(true);
 				}
-				Sign sign = (Sign)signBlock.getState();
-				sign.setLine(0, event.getLine(0));
-				sign.setLine(1, event.getLine(1));
-				sign.setLine(2, event.getLine(2));
-				sign.setLine(3, event.getLine(3));
-				sign.update(true);
+			} else {
+				event.setCancelled(true);
 			}
-			
-			player.sendMessage(ChatColor.GOLD + "[MailChest] Created new mailbox");
 		}
 	}
 }
