@@ -16,7 +16,7 @@ public class MailChest extends JavaPlugin {
 	@Override
 	public void onEnable() {
 		this.saveDefaultConfig();
-		getServer().getPluginManager().registerEvents(new BlockPlaceListener(this), this);
+		getServer().getPluginManager().registerEvents(new BlockListener(this), this);
 		readMailboxData();
 	}
 

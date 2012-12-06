@@ -6,10 +6,11 @@ import org.bukkit.block.*;
 import org.bukkit.entity.Player;
 import org.bukkit.event.*;
 import org.bukkit.event.block.*;
+import org.bukkit.event.entity.EntityExplodeEvent;
 
-public class BlockPlaceListener implements Listener {
+public class BlockListener implements Listener {
 	private MailChest plugin;
-	public BlockPlaceListener(MailChest plugin) {
+	public BlockListener(MailChest plugin) {
 		this.plugin = plugin;
 	}
 	
@@ -44,15 +45,8 @@ public class BlockPlaceListener implements Listener {
 			Sign sign = (Sign)block.getState();
 			if (sign.getLine(0).equals("[" + plugin.getConfig().getString("sign-text") + "]")) {
 				Player player = event.getPlayer();
-				BlockFace[] directions = {BlockFace.NORTH, BlockFace.SOUTH, BlockFace.EAST, BlockFace.WEST};
-				Block chest = null;
 				
-				for (BlockFace direction : directions) {
-					if (block.getRelative(direction).getType() == Material.CHEST) {
-						chest = block.getRelative(direction);
-						break;
-					}
-				}
+				Block chest = findChestBySign(block);
 				
 				if (chest == null) {
 					return;
@@ -70,15 +64,8 @@ public class BlockPlaceListener implements Listener {
 		if (event.getLine(0).equals("[" + plugin.getConfig().getString("sign-text") + "]")) {
 			Player player = event.getPlayer();
 			Block signBlock = event.getBlock();
-			BlockFace[] directions = {BlockFace.NORTH, BlockFace.SOUTH, BlockFace.EAST, BlockFace.WEST};
-			Block chest = null;
 			
-			for (BlockFace direction : directions) {
-				if (signBlock.getRelative(direction).getType() == Material.CHEST) {
-					chest = signBlock.getRelative(direction);
-					break;
-				}
-			}
+			Block chest = findChestBySign(signBlock);
 			
 			if (chest == null) {
 				player.sendMessage(ChatColor.RED + "[MailChest] No chest found.");
@@ -115,6 +102,63 @@ public class BlockPlaceListener implements Listener {
 				}
 			} else {
 				event.setCancelled(true);
+			}
+		}
+	}
+
+	private Block findChestBySign(Block signBlock) {
+		BlockFace[] directions = {BlockFace.NORTH, BlockFace.SOUTH, BlockFace.EAST, BlockFace.WEST};
+		Block chest = null;
+		
+		for (BlockFace direction : directions) {
+			if (signBlock.getRelative(direction).getType() == Material.CHEST) {
+				chest = signBlock.getRelative(direction);
+				break;
+			}
+		}
+		return chest;
+	}
+	
+	@EventHandler
+	public void onEntityExplode(EntityExplodeEvent event) {
+		if (event.isCancelled()) return;
+		for (int i=0; i < event.blockList().size(); i++) {
+			Block block = event.blockList().get(i);
+			if (block.getType() == Material.CHEST) {
+				if (!plugin.destroyMailbox(null, block)) {
+					event.blockList().remove(i);
+					i--;
+				}
+			} else if (block.getType() == Material.WALL_SIGN) {
+				Block chest = findChestBySign(block);
+				if (chest != null && !plugin.destroyMailbox(null, chest)) {
+					event.blockList().remove(i);
+					i--;
+				}
+			}
+		}
+	}
+	
+	@EventHandler
+	public void onBlockBurn(BlockBurnEvent event) {
+		if (event.isCancelled()) return;
+		Block block = event.getBlock();
+		if (block.getType() == Material.CHEST && plugin.isMailbox(block)) {
+			if (!plugin.destroyMailbox(null, block)) {
+				event.setCancelled(true);
+			}
+		} else if (block.getType() == Material.WALL_SIGN) {
+			Sign sign = (Sign)block.getState();
+			if (sign.getLine(0).equals("[" + plugin.getConfig().getString("sign-text") + "]")) {
+				Block chest = findChestBySign(block);
+				
+				if (chest == null) {
+					return;
+				}
+				
+				if (!plugin.destroyMailbox(null, chest)) {
+					event.setCancelled(true);
+				}
 			}
 		}
 	}
