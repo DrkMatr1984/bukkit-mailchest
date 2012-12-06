@@ -3,20 +3,27 @@ package com.github.deltawhy.mailchest;
 import java.util.HashMap;
 
 import java.io.*;
+
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.block.*;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.Inventory;
 
 public class MailChest extends JavaPlugin {
 	private HashMap<MailboxLocation, Mailbox> mailboxes;
+	private InventoryListener inventoryListener;
 	
 	@Override
 	public void onEnable() {
 		this.saveDefaultConfig();
 		getServer().getPluginManager().registerEvents(new BlockListener(this), this);
+		getServer().getPluginManager().registerEvents(new PlayerListener(this), this);
+		inventoryListener = new InventoryListener(this);
+		getServer().getPluginManager().registerEvents(inventoryListener, this);
 		readMailboxData();
 	}
 
@@ -138,6 +145,19 @@ public class MailChest extends JavaPlugin {
 		} else {
 			player.sendMessage(ChatColor.RED + "[MailChest] You don't have permission to destroy this mailbox.");
 			return false;
+		}
+	}
+
+	public void openMailbox(Player player, Block block) {
+		Mailbox box = getMailbox(block);
+		Chest chest = (Chest)block.getState();
+		
+		if (!player.hasPermission("mailchest.send")) {
+			player.sendMessage(ChatColor.RED + "[MailChest] You don't have permission to send mail.");
+		//} else if {
+		} else {
+			inventoryListener.add(box, chest);
+			player.openInventory(box.getInventory());
 		}
 	}
 }

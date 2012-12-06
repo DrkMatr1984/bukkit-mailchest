@@ -10,6 +10,7 @@ import org.bukkit.event.entity.EntityExplodeEvent;
 
 public class BlockListener implements Listener {
 	private MailChest plugin;
+	
 	public BlockListener(MailChest plugin) {
 		this.plugin = plugin;
 	}
