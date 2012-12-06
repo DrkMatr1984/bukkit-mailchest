@@ -4,14 +4,12 @@ import java.util.HashMap;
 
 import java.io.*;
 
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.block.*;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.Inventory;
 
 public class MailChest extends JavaPlugin {
 	private HashMap<MailboxLocation, Mailbox> mailboxes;
@@ -91,27 +89,35 @@ public class MailChest extends JavaPlugin {
 	}
 	
 	public boolean autoCreateMailbox(Block chest, Player player) {
-		if (player.hasPermission("mailchest.autocreate")) {
+		if (isMailbox(chest)) {
+			player.sendMessage(ChatColor.RED + "[MailChest] That's already a mailbox!");
+			return false;
+		} else if (!player.hasPermission("mailchest.autocreate")) {
+			return false;
+		} else {
 			Mailbox box = new Mailbox(player.getName());
 			mailboxes.put(new MailboxLocation(chest.getLocation()), box);
 			writeMailboxData();
 			player.sendMessage(ChatColor.GOLD + "[MailChest] Created a mailbox!");
+			getLogger().info(player.getName() + " created a mailbox.");
 			return true;
-		} else {
-			return false;
 		}
 	}
 	
  	public boolean createMailbox(Block chest, Player player) {
-		if (player.hasPermission("mailchest.create")) {
+ 		if (isMailbox(chest)) {
+			player.sendMessage(ChatColor.RED + "[MailChest] That's already a mailbox!");
+			return false;
+		} else if (!player.hasPermission("mailchest.create")) {
+			player.sendMessage(ChatColor.RED + "[MailChest] You don't have permission to create mailboxes.");
+			return false;
+		} else {
 			Mailbox box = new Mailbox(player.getName());
 			mailboxes.put(new MailboxLocation(chest.getLocation()), box);
 			writeMailboxData();
 			player.sendMessage(ChatColor.GOLD + "[MailChest] Created a mailbox!");
+			getLogger().info(player.getName() + " created a mailbox.");
 			return true;
-		} else {
-			player.sendMessage(ChatColor.RED + "[MailChest] You don't have permission to create mailboxes.");
-			return false;
 		}
  	}
  	
@@ -141,6 +147,11 @@ public class MailChest extends JavaPlugin {
 			mailboxes.remove(new MailboxLocation(block.getLocation()));
 			writeMailboxData();
 			player.sendMessage(ChatColor.GOLD + "[MailChest] Destroyed a mailbox.");
+			if (player.getName().equals(box.getOwnerName())) {
+				getLogger().info(player.getName() + " destroyed their mailbox.");
+			} else {
+				getLogger().info(player.getName() + " destroyed " + box.getOwnerName() + "'s mailbox.");
+			}
 			return true;
 		} else {
 			player.sendMessage(ChatColor.RED + "[MailChest] You don't have permission to destroy this mailbox.");
@@ -154,7 +165,6 @@ public class MailChest extends JavaPlugin {
 		
 		if (!player.hasPermission("mailchest.send")) {
 			player.sendMessage(ChatColor.RED + "[MailChest] You don't have permission to send mail.");
-		//} else if {
 		} else {
 			inventoryListener.add(box, chest);
 			player.openInventory(box.getInventory());

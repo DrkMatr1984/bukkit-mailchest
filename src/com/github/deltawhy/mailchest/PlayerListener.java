@@ -4,6 +4,7 @@ import org.bukkit.Material;
 import org.bukkit.block.*;
 import org.bukkit.entity.Player;
 import org.bukkit.event.*;
+import org.bukkit.event.block.Action;
 import org.bukkit.event.player.*;
 
 public class PlayerListener implements Listener {
@@ -22,7 +23,7 @@ public class PlayerListener implements Listener {
 		Player player = event.getPlayer();
 		if (player.equals(plugin.getMailboxOwner(chest)) || (player.hasPermission("mailchest.snoop") && player.isSneaking())) {
 			return;
-		} else {
+		} else if (event.getAction() == Action.RIGHT_CLICK_BLOCK){
 			event.setCancelled(true);
 			plugin.openMailbox(player, chest);
 		}

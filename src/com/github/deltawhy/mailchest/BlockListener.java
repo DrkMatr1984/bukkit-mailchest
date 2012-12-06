@@ -7,6 +7,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.*;
 import org.bukkit.event.block.*;
 import org.bukkit.event.entity.EntityExplodeEvent;
+import org.bukkit.inventory.DoubleChestInventory;
 
 public class BlockListener implements Listener {
 	private MailChest plugin;
@@ -23,6 +24,16 @@ public class BlockListener implements Listener {
 		
 		Block block = event.getBlock();
 		if (block.getType() == Material.CHEST) {
+			Block otherChest = findAdjacentChest(block);
+			if (otherChest != null) {
+				if (plugin.isMailbox(otherChest)) {
+					player.sendMessage(ChatColor.RED + "[MailChest] You can't have a double chest mailbox.");
+					event.setCancelled(true);
+					return;
+				} else {
+					return;
+				}
+			}
 			Block beneathBlock = block.getRelative(BlockFace.DOWN);
 			if (beneathBlock != null && beneathBlock.getType() == Material.FENCE 
 					&& plugin.getConfig().getBoolean("auto-create.fence")) {
@@ -47,7 +58,7 @@ public class BlockListener implements Listener {
 			if (sign.getLine(0).equals("[" + plugin.getConfig().getString("sign-text") + "]")) {
 				Player player = event.getPlayer();
 				
-				Block chest = findChestBySign(block);
+				Block chest = findAdjacentChest(block);
 				
 				if (chest == null) {
 					return;
@@ -66,10 +77,18 @@ public class BlockListener implements Listener {
 			Player player = event.getPlayer();
 			Block signBlock = event.getBlock();
 			
-			Block chest = findChestBySign(signBlock);
+			Block chest = findAdjacentChest(signBlock);
 			
 			if (chest == null) {
 				player.sendMessage(ChatColor.RED + "[MailChest] No chest found.");
+				event.setCancelled(true);
+				return;
+			}
+			
+			Block otherChest = findAdjacentChest(chest);
+			
+			if (otherChest != null) {
+				player.sendMessage(ChatColor.RED + "[MailChest] You can't have a double chest mailbox.");
 				event.setCancelled(true);
 				return;
 			}
@@ -96,9 +115,9 @@ public class BlockListener implements Listener {
 					}
 					Sign sign = (Sign)signBlock.getState();
 					sign.setLine(0, event.getLine(0));
-					sign.setLine(1, event.getLine(1));
-					sign.setLine(2, event.getLine(2));
-					sign.setLine(3, event.getLine(3));
+					sign.setLine(1, player.getName());
+					sign.setLine(2, "");
+					sign.setLine(3, "");
 					sign.update(true);
 				}
 			} else {
@@ -107,13 +126,13 @@ public class BlockListener implements Listener {
 		}
 	}
 
-	private Block findChestBySign(Block signBlock) {
+	private Block findAdjacentChest(Block block) {
 		BlockFace[] directions = {BlockFace.NORTH, BlockFace.SOUTH, BlockFace.EAST, BlockFace.WEST};
 		Block chest = null;
 		
 		for (BlockFace direction : directions) {
-			if (signBlock.getRelative(direction).getType() == Material.CHEST) {
-				chest = signBlock.getRelative(direction);
+			if (block.getRelative(direction).getType() == Material.CHEST) {
+				chest = block.getRelative(direction);
 				break;
 			}
 		}
@@ -131,7 +150,7 @@ public class BlockListener implements Listener {
 					i--;
 				}
 			} else if (block.getType() == Material.WALL_SIGN) {
-				Block chest = findChestBySign(block);
+				Block chest = findAdjacentChest(block);
 				if (chest != null && !plugin.destroyMailbox(null, chest)) {
 					event.blockList().remove(i);
 					i--;
@@ -151,7 +170,7 @@ public class BlockListener implements Listener {
 		} else if (block.getType() == Material.WALL_SIGN) {
 			Sign sign = (Sign)block.getState();
 			if (sign.getLine(0).equals("[" + plugin.getConfig().getString("sign-text") + "]")) {
-				Block chest = findChestBySign(block);
+				Block chest = findAdjacentChest(block);
 				
 				if (chest == null) {
 					return;

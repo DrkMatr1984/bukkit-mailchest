@@ -38,12 +38,8 @@ public class InventoryListener implements Listener {
 		if (i == -1) return;
 		Chest chest = chests.get(i);
 		
-		plugin.getLogger().info(chest.toString());
-		
 		Inventory chestInv = chest.getInventory();
-		
-		plugin.getLogger().info(chestInv.toString());
-		
+				
 		HumanEntity player = event.getPlayer();
 		Inventory playerInv = player.getInventory();
 		
@@ -61,7 +57,6 @@ public class InventoryListener implements Listener {
 		
 		inv.clear();
 		
-		plugin.getLogger().info("inventoryClose");
 		if (overflowed && player instanceof Player) {
 			((Player)player).sendMessage(ChatColor.RED + "[MailChest] Couldn't fit everything in the mailbox."
 					+ " Your items have been returned.");
