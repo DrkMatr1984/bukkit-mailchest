@@ -12,6 +12,7 @@ import org.bukkit.entity.Player;
 public class MailChest extends JavaPlugin {
 	private HashMap<MailboxLocation, Mailbox> mailboxes;
 	private InventoryListener inventoryListener;
+	public ConfigAccessor userConfig;
 	
 	@Override
 	public void onEnable() {
@@ -20,12 +21,15 @@ public class MailChest extends JavaPlugin {
 		getServer().getPluginManager().registerEvents(new PlayerListener(this), this);
 		inventoryListener = new InventoryListener(this);
 		getServer().getPluginManager().registerEvents(inventoryListener, this);
+		userConfig = new ConfigAccessor(this, "users.yml");
+		userConfig.reloadConfig();
 		readMailboxData();
 	}
 
 	@SuppressWarnings("unchecked")
 	private void readMailboxData() {
 		try {
+			getLogger().info("Loading mailbox data");
 			File mailboxFile = new File(getDataFolder(), "mailboxes.dat");
 			if (mailboxFile.exists()) {
 				FileInputStream fileIn = new FileInputStream(mailboxFile);
@@ -51,11 +55,12 @@ public class MailChest extends JavaPlugin {
 			mailboxes = new HashMap<MailboxLocation, Mailbox>();
 		}
 		
-		getLogger().info(mailboxes.toString());
+		//getLogger().info(mailboxes.toString());
 	}
 	
 	private void writeMailboxData() {
 		try {
+			getLogger().info("Saving mailbox data");
 			File mailboxFile = new File(getDataFolder(), "mailboxes.dat");
 			FileOutputStream fileOut = new FileOutputStream(mailboxFile);
 			ObjectOutputStream out = new ObjectOutputStream(fileOut);
@@ -67,7 +72,7 @@ public class MailChest extends JavaPlugin {
 			getLogger().warning("Could not write data file!");
 		}
 		
-		getLogger().info(mailboxes.toString());
+		//getLogger().info(mailboxes.toString());
 	}
 	
 	public boolean autoCreateMailbox(Block chest, Player player) {
@@ -159,5 +164,10 @@ public class MailChest extends JavaPlugin {
 			inventoryListener.add(box, chest);
 			player.openInventory(box.getInventory());
 		}
+	}
+
+	public void gotMail(String ownerName) {
+		userConfig.getConfig().set(ownerName + ".got-mail", new Boolean(true));
+		userConfig.saveConfig();
 	}
 }

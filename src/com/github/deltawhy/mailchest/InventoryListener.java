@@ -68,6 +68,9 @@ public class InventoryListener implements Listener {
 			Player owner = plugin.getMailboxOwner((Mailbox)box);
 			if (owner != null && owner.hasPermission("mailchest.notify")) {
 				owner.sendMessage(ChatColor.DARK_AQUA + "[MailChest] You've got mail!");
+			} else if (owner == null) {
+				//owner is offline
+				plugin.gotMail(((Mailbox)box).getOwnerName());
 			}
 		}
 	}

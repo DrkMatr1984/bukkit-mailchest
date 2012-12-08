@@ -1,5 +1,6 @@
 package com.github.deltawhy.mailchest;
 
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.block.*;
 import org.bukkit.entity.Player;
@@ -26,6 +27,17 @@ public class PlayerListener implements Listener {
 		} else if (event.getAction() == Action.RIGHT_CLICK_BLOCK){
 			event.setCancelled(true);
 			plugin.openMailbox(player, chest);
+		}
+	}
+	
+	@EventHandler (priority = EventPriority.MONITOR)
+	public void onPlayerJoin(PlayerJoinEvent event) {
+		Player player = event.getPlayer();
+		if (plugin.userConfig.getConfig().getBoolean(player.getName() + ".got-mail", false)) {
+			if (player.hasPermission("mailchest.notify")) {
+				player.sendMessage(ChatColor.DARK_AQUA + "[MailChest] You've got mail!");
+			}
+			plugin.userConfig.getConfig().set(player.getName() + ".got-mail", new Boolean(false));
 		}
 	}
 }
