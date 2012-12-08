@@ -61,5 +61,12 @@ public class InventoryListener implements Listener {
 			((Player)player).sendMessage(ChatColor.RED + "[MailChest] Couldn't fit everything in the mailbox."
 					+ " Your items have been returned.");
 		}
+		
+		if (box instanceof Mailbox) {
+			Player owner = plugin.getMailboxOwner((Mailbox)box);
+			if (owner != null && owner.hasPermission("mailchest.notify")) {
+				owner.sendMessage(ChatColor.AQUA + "[MailChest] You've got mail!");
+			}
+		}
 	}
 }

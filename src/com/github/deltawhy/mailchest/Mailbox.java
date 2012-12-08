@@ -11,7 +11,7 @@ public class Mailbox implements Serializable, InventoryHolder {
 
 	private String ownerName;
 
-	private Inventory inventory;
+	private transient Inventory inventory;
 	
 	public Mailbox(String ownerName) {
 		this.setOwnerName(ownerName);
