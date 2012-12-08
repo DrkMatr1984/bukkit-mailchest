@@ -10,11 +10,17 @@ public class Mailbox implements Serializable, InventoryHolder {
 	private static final long serialVersionUID = 1L;
 
 	private String ownerName;
+	private String creatorName;
 
 	private transient Inventory inventory;
 	
+	public Mailbox(String creatorName, String ownerName) {
+		this.ownerName = ownerName;
+		this.creatorName = creatorName;
+	}
+	
 	public Mailbox(String ownerName) {
-		this.setOwnerName(ownerName);
+		this(ownerName, ownerName);
 	}
 
 	public String getOwnerName() {
@@ -25,8 +31,16 @@ public class Mailbox implements Serializable, InventoryHolder {
 		this.ownerName = ownerName;
 	}
 	
+	public String getCreatorName() {
+		return creatorName;
+	}
+
+	public void setCreatorName(String creatorName) {
+		this.creatorName = creatorName;
+	}
+
 	public String toString() {
-		return String.format("<Mailbox owner=%s>", ownerName);
+		return String.format("<Mailbox owner=%s creator=%s>", ownerName, creatorName);
 	}
 
 	@Override

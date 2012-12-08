@@ -7,7 +7,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.*;
 import org.bukkit.event.block.*;
 import org.bukkit.event.entity.EntityExplodeEvent;
-import org.bukkit.inventory.DoubleChestInventory;
 
 public class BlockListener implements Listener {
 	private MailChest plugin;
@@ -74,13 +73,13 @@ public class BlockListener implements Listener {
 	@EventHandler
 	public void onSignChange(SignChangeEvent event) {
 		if (event.getLine(0).equals("[" + plugin.getConfig().getString("sign-text") + "]")) {
-			Player player = event.getPlayer();
+			Player creator = event.getPlayer();
 			Block signBlock = event.getBlock();
 			
 			Block chest = findAdjacentChest(signBlock);
 			
 			if (chest == null) {
-				player.sendMessage(ChatColor.RED + "[MailChest] No chest found.");
+				creator.sendMessage(ChatColor.RED + "[MailChest] No chest found.");
 				event.setCancelled(true);
 				return;
 			}
@@ -88,12 +87,12 @@ public class BlockListener implements Listener {
 			Block otherChest = findAdjacentChest(chest);
 			
 			if (otherChest != null) {
-				player.sendMessage(ChatColor.RED + "[MailChest] You can't have a double chest mailbox.");
+				creator.sendMessage(ChatColor.RED + "[MailChest] You can't have a double chest mailbox.");
 				event.setCancelled(true);
 				return;
 			}
 			
-			if (plugin.createMailbox(chest, player)) {
+			if (plugin.createMailbox(chest, creator, event.getLine(1))) {
 				//attach sign to chest
 				if (signBlock.getType() == Material.SIGN_POST) {
 					signBlock.setType(Material.WALL_SIGN);
@@ -115,7 +114,7 @@ public class BlockListener implements Listener {
 					}
 					Sign sign = (Sign)signBlock.getState();
 					sign.setLine(0, event.getLine(0));
-					sign.setLine(1, player.getName());
+					sign.setLine(1, creator.getName());
 					sign.setLine(2, "");
 					sign.setLine(3, "");
 					sign.update(true);

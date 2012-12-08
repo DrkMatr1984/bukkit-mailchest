@@ -44,8 +44,10 @@ public class InventoryListener implements Listener {
 		Inventory playerInv = player.getInventory();
 		
 		boolean overflowed = false;
+		boolean empty = true;
 		for (ItemStack stack : inv) {
 			if (stack == null) continue;
+			empty = false;
 			HashMap<Integer, ItemStack> overflow = chestInv.addItem(stack);
 			if (overflow != null && overflow.size() > 0) {
 				overflowed = true;
@@ -62,10 +64,10 @@ public class InventoryListener implements Listener {
 					+ " Your items have been returned.");
 		}
 		
-		if (box instanceof Mailbox) {
+		if (!empty && box instanceof Mailbox) {
 			Player owner = plugin.getMailboxOwner((Mailbox)box);
 			if (owner != null && owner.hasPermission("mailchest.notify")) {
-				owner.sendMessage(ChatColor.AQUA + "[MailChest] You've got mail!");
+				owner.sendMessage(ChatColor.DARK_AQUA + "[MailChest] You've got mail!");
 			}
 		}
 	}
