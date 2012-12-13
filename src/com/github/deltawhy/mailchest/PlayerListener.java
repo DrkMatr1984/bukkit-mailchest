@@ -38,6 +38,7 @@ public class PlayerListener implements Listener {
 				player.sendMessage(ChatColor.DARK_AQUA + "[MailChest] You've got mail!");
 			}
 			plugin.userConfig.getConfig().set(player.getName() + ".got-mail", new Boolean(false));
+			plugin.userConfig.saveConfig();
 		}
 	}
 }
